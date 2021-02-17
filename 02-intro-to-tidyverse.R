@@ -104,6 +104,15 @@ us_israel_vaccinations %>%
   summarize(percent_vaccinated = max(total_vaccinations_per_hundred,
                 na.rm = TRUE))
 
+# get the lastest date per country
+us_israel_vaccinations %>%
+  group_by(country) %>%
+  summarize(lastest_observation_date = max(date, na.rm = TRUE))
+
+us_israel_vaccinations %>%
+  filter(date == parse_date("2021-02-07")) %>%
+  select(country, total_vaccinations_per_hundred)
+
 # north america (do the summarization, but starting with north_america_vaccinations)
 north_america_vaccinations %>%
   group_by(country) %>%

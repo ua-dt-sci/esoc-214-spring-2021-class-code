@@ -48,5 +48,51 @@ nfl_salary_clean %>%
 nfl_salary_longer %>%
   count(position)
 
+############### February 16, 2021 #############
+glimpse(nfl_salary_data)
 
+# pivot all columns that hold position names
+nfl_salary_longer <- nfl_salary_data %>%
+  pivot_longer(cols = Cornerback:`Wide Receiver`,
+               names_to = "position",
+               values_to = "salary") %>%
+  filter(!is.na(salary))
 
+nfl_salary_longer %>%
+  group_by(position) %>% 
+  summarise(mean_salary = mean(salary)) %>%
+  arrange(mean_salary)
+
+### mutate ####
+nfl_salary_longer <- nfl_salary_longer %>%
+  mutate(is_quarterback = (position == "Quarterback"))
+
+nfl_salary_longer %>%
+  group_by(is_quarterback) %>%
+  summarise(mean_salary = mean(salary))
+
+###### Visualization with ggplot ######
+nfl_salary_longer %>%
+  ggplot(aes(x = year,
+             y = salary,
+             color = position))  +
+  geom_point()
+
+# group_by %>%  summarize() %>%  ggplot()
+nfl_salary_longer %>%
+  group_by(year, position) %>%
+  summarize(mean_salary = mean(salary)) %>%
+  ggplot(aes(x = year,
+             y = mean_salary,
+             color = position)) +
+  geom_point() +
+  geom_line()
+
+nfl_salary_longer %>%
+  group_by(year, is_quarterback) %>%
+  summarize(mean_salary = mean(salary)) %>%
+  ggplot(aes(x = year,
+             y = mean_salary,
+             color = is_quarterback)) +
+  geom_point() +
+  geom_line()
