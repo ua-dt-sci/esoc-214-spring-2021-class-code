@@ -95,4 +95,9 @@ nfl_salary_longer %>%
              y = mean_salary,
              color = is_quarterback)) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  labs(y = "Mean Salary",
+       x = "",
+       color  = "QuarterBack?",
+       title = "NFL mean salary across the years",
+       subtitle = "Split into quarterback vs. non-quarterback")
