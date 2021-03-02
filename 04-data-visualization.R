@@ -83,7 +83,78 @@ spotify_data %>%
              fill = playlist_genre)) +
   geom_col()
 
+########################### MARCH 2 2021 #######################
+# to plot a pie chart we need a variable that sums to 100
+spotify_data %>%
+  count(playlist_genre) %>%
+  mutate(total = sum(n),
+         percentage = n/total) %>%
+  ggplot(aes(x = playlist_genre,
+             y = percentage)) +
+  geom_col()
 
+spotify_data %>%
+  count(playlist_genre) %>%
+  mutate(total = sum(n),
+         percentage = n/total) %>%
+  ggplot(aes(x = "",
+             fill = playlist_genre,
+             y = percentage)) +
+  geom_col() +
+  coord_polar("y", start = 0)
 
+# geom_bar() vs. geom_col()
+# geom_bar() map only one axis the other is calculated for you (count)
+spotify_data %>%
+  ggplot(aes(x = playlist_genre)) +
+  geom_bar()
 
+spotify_data %>%
+  count(playlist_genre)
+
+# geom_col() map both variables
+spotify_data %>%
+  count(playlist_genre) %>%
+  ggplot(aes(x = playlist_genre,
+             y = n)) +
+  geom_col()
+
+################# ARTISTS #####################
+# count how many songs we have per artist
+# arrange so we see the the artists with the most songs at the top of the output
+spotify_data %>%
+  count(track_artist, sort = TRUE)
+
+spotify_data %>%
+  count(track_artist) %>%
+  arrange(-n)
+
+# filter our data to keep just some artists
+my_two_favorite_bands <- spotify_data %>%
+  filter(track_artist == "Queen" | track_artist == "The Beatles")
+
+# check your data
+my_two_favorite_bands %>%
+  count(track_artist)
+
+# filter our data to keep 5 top artists
+top_5_artists <- spotify_data %>%
+  filter(track_artist %in% c("Martin Garrix", "Queen", "The Chainsmokers",
+                             "David Guetta", "Don Omar"))
+top_5_artists %>%
+  count(track_artist)
+
+# create new year column in my data
+my_two_favorite_bands <- my_two_favorite_bands %>%
+  mutate(year = substr(track_album_release_date, 1, 4),
+         decade = paste0(substr(track_album_release_date, 1, 3), "0"))
+
+# Question: has duration changed for these two bands over time?
+my_two_favorite_bands %>%
+  ggplot(aes(x = year,
+             y = duration_ms,
+             color = track_artist,
+             label = track_name)) + 
+  geom_point(alpha = .5) +
+  geom_text(size = 2)
 
