@@ -149,12 +149,89 @@ my_two_favorite_bands <- my_two_favorite_bands %>%
   mutate(year = substr(track_album_release_date, 1, 4),
          decade = paste0(substr(track_album_release_date, 1, 3), "0"))
 
+# mutate year so it is a number
+my_two_favorite_bands <- my_two_favorite_bands %>%
+  mutate(year = as.numeric(year))
+
 # Question: has duration changed for these two bands over time?
 my_two_favorite_bands %>%
   ggplot(aes(x = year,
              y = duration_ms,
              color = track_artist,
-             label = track_name)) + 
+             label = track_name,
+             size = track_popularity)) + 
   geom_point(alpha = .5) +
-  geom_text(size = 2)
+  labs(x = "year song was released",
+       y = "song duration in miliseconds",
+       color = "Band",
+       title = "Song duration across years",
+       subtitle = "Displaying songs by Queen and The Beatles",
+       caption = "Data from spotify") +
+  geom_text() +
+  scale_x_continuous(breaks = c(1965, 1975, 1985, 1995, 2005, 2015, 2020))
+
+################### March 4 2021 #####################
+# filter by partial match -- contains a string
+the_bands_data <- spotify_data %>%
+  filter(grepl("the\\s", track_artist, ignore.case = TRUE))
+
+the_bands_data %>%
+  count(track_artist)
+
+####### sumarization + plotting #####
+# What is the mean popularity of my two favorite bands across decades (release)
+# start with my two favorite bands dataframe
+# group by decade, track artist and then
+# summarize mean of track popularity
+# plot a line plot
+my_two_favorite_bands %>%
+  group_by(decade, track_artist) %>%
+  summarize(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             color = track_artist,
+             group = track_artist)) +
+  geom_point() +
+  geom_line()
+
+# plot a bar plot
+my_two_favorite_bands %>%
+  group_by(decade, track_artist) %>%
+  summarize(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~track_artist)
+
+########### Filter the Data to keep only songs by Drake ######
+# create a new dataframe with track_artist equals Drake
+drake_songs <- spotify_data %>%
+  filter(track_artist == "Drake")
+
+library(ggthemes)
+# What is the mean popularity of different albums by Drake
+drake_songs %>%
+  group_by(track_album_name) %>%
+  summarize(song_count = n(),
+            mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(y = reorder(track_album_name, mean_popularity),
+             x = mean_popularity,
+             label = song_count)) +
+  geom_col() +
+  geom_label() +
+  labs(y = "",
+       x = "Mean Album Popularity",
+       title = "Mean popularity of Drake Albums")
+
+
+
+my_two_favorite_bands %>% 
+  group_by(decade, track_artist) %>% 
+  summarize(mean_popularity = mean(track_popularity)) %>% 
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col(position = position_dodge(preserve = 'single'))
+
 
