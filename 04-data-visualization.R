@@ -217,12 +217,27 @@ drake_songs %>%
             mean_popularity = mean(track_popularity)) %>%
   ggplot(aes(y = reorder(track_album_name, mean_popularity),
              x = mean_popularity,
-             label = song_count)) +
+             label = song_count,
+             fill = track_album_name)) +
   geom_col() +
   geom_label() +
   labs(y = "",
        x = "Mean Album Popularity",
-       title = "Mean popularity of Drake Albums")
+       title = "Mean popularity of Drake Albums") +
+  theme(legend.position = "none")
+
+
+
+my_two_favorite_bands %>%
+  group_by(decade, track_artist) %>%
+  summarize(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = decade)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~track_artist) +
+  scale_fill_brewer() +
+  theme_linedraw()
 
 
 
@@ -232,6 +247,8 @@ my_two_favorite_bands %>%
   ggplot(aes(x = decade,
              y = mean_popularity,
              fill = track_artist)) +
-  geom_col(position = position_dodge(preserve = 'single'))
+  geom_col(position = position_dodge(preserve = 'single')) +
+  scale_fill_colorblind() +
+  theme_linedraw()
 
 
