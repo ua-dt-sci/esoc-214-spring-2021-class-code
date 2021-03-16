@@ -43,10 +43,74 @@ olympic_events %>%
   count(Year, Season, Sex) %>%
   view()
 
+####### March 16 2021 #####################
+# count medals
+olympic_events %>%
+  filter(!is.na(Medal)) %>%
+  count(Team, Medal, sort = TRUE)
+
+# join noc_regions and olympic
+olympic_events <- left_join(olympic_events,
+                            noc_regions)
 
 
+# count medals using region instead of team
+olympic_events %>%
+  filter(!is.na(Medal)) %>%
+  count(region, Medal, sort = TRUE)
 
+# get top 5 countries with the most medals
+top_5_regions <- olympic_events %>%
+  filter(!is.na(Medal)) %>%
+  count(region) %>%
+  top_n(5)
 
+top_5_regions$region
 
+# filter to keep 5 top countries
+data_from_top5 <- olympic_events %>%
+  filter(region %in% top_5_regions$region)
+
+data_from_top5 %>%
+  count(region)
+
+# using data_from_top5
+# filter data to keep Summer Olympics only
+# summarize mean height by Year and region and Sex
+# plot it! check at 2:51pm
+data_from_top5 %>%
+  filter(Season == "Summer") %>%
+  group_by(Year, region, Sex) %>%
+  summarize(mean_height = mean(Height, na.rm = TRUE)) %>%
+  ggplot(aes(x = Year,
+             y = mean_height,
+             color = Sex)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~region)
+
+# add Season to the plot mapping it shape
+data_from_top5 %>%
+  group_by(Year, Season, region, Sex) %>%
+  summarize(mean_height = mean(Height, na.rm = TRUE)) %>%
+  ggplot(aes(x = Year,
+             y = mean_height,
+             color = Sex,
+             shape = Season,
+             linetype = Season)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~region+Season)
+
+# count Medal (Gold, Silver, Bronze) by country
+# use data_from_top5 (for the top5 countries only)
+# check in at 3:12pm
+data_from_top5 %>%
+  filter(!is.na(Medal)) %>%
+  count(region, Medal) %>%
+  ggplot(aes(x = Medal,
+             y = n,
+             fill = region)) +
+  geom_col(position = "dodge")
 
 
