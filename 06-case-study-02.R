@@ -72,6 +72,55 @@ global_temperatures_countries %>%
   geom_point() +
   geom_line()
 
+#################### March 25 2021 #################
+# start with global_temperatures_countries and then
+# filter to keep data only since 1850 and
+# group by continent and year and then
+# summarize mean of average_temperature
+# check in at 2:25pm
+# add ggplot to it, use geom_point() and map color to continent
+global_temperatures_countries %>%
+  filter(year > 1850) %>%
+  group_by(continent, year) %>%
+  summarize(mean_temperature = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = year,
+             y = mean_temperature,
+             color = continent)) +
+  geom_point()
 
+# let's choose countries to filter our data by
+countries_to_keep <- c("Poland", "United States", "China", "India", "Brazil")
 
+filtered_temperatures <- global_temperatures_countries %>%
+  filter(country %in% countries_to_keep)
 
+filtered_temperatures %>%
+  count(country)
+
+# plot it!
+filtered_temperatures %>%
+  filter(year > 1899) %>%
+  group_by(country, year) %>%
+  summarize(mean_temperature = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = year,
+             y = mean_temperature,
+             color = country)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(~country, scales = "free") +
+  labs(caption = "each plot is in a different scale")
+
+library(ggthemes)
+# plot it by month
+filtered_temperatures %>%
+  group_by(country, month) %>%
+  summarize(mean_temperature = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = month,
+             y = mean_temperature,
+             color = country)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = c(1:12)) +
+  facet_wrap(~country, scales = "free") +
+  theme_wsj() +
+  labs(caption = "plots are in different scales")
