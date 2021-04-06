@@ -96,3 +96,6 @@ award_count_w_pop %>%
   scale_fill_continuous(low = "orange",
                         high = "orange4",
                         name = "Awards per 100k people")
+
+# save the wrangled/tidy/clean file
+write_csv(beer_awards_w_pop, "processed_data/beer_awards_w_pop.csv")

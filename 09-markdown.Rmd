@@ -1,0 +1,84 @@
+---
+title: "Great American Beer Festival -- Analysis"
+subtitle: "A ESOC 214 demonstration"
+author: "Adriana Picoral"
+date: "Spring 2021"
+output:
+  word_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Text Formatting
+
+## Italics and Bold
+
+This is a *word in italics*.
+
+This is a **word in bold**.
+
+## Lists
+
+* this is the first item
+* this is the second item
+
+1. this is the first item
+1. this is the second item
+1. this is the third item
+
+## Other formatting
+
+You can add a link to a website like [Kaggle website](https://www.kaggle.com) to link out.
+
+> this is a block quote
+
+# Data Wrangling
+
+Let's read our data in.
+
+```{r echo=FALSE, message=FALSE}
+# load library
+library(tidyverse)
+
+# read data in
+beer_awards <- read_csv("data/clean_beer_awards.csv")
+
+# inspect data
+glimpse(beer_awards)
+```
+
+Here we printing the first 10 rows in our data.
+
+```{r}
+beer_awards %>%
+  head(10) %>%
+  kable()
+```
+
+> Question: What are the top 10 states with the most beer awards in the United States?
+
+```{r message=FALSE}
+beer_awards %>%
+  count(state_name, sort = TRUE) %>%
+  top_n(10) %>%
+  kable(col.names = c("State", "Award Count"))
+```
+
+> Question: What is the distribution of awards across different regions in the United States?
+
+```{r}
+# start with beer_awards and the count by region and the format the
+# table with kable (check in at 3:10pm)
+beer_awards %>%
+  count(region) %>%
+  arrange(-n) %>%
+  kable(col.names = c("Region", "Arward Count"))
+```
+
+
+
+
