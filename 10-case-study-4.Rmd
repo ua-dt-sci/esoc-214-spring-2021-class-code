@@ -1,0 +1,37 @@
+---
+title: "US Presidential Elections 2020"
+author: "Adriana Picoral"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+# Data Wrangling
+
+The data used in this document is from [Kaggle's US Election 2020](https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv).
+
+```{r}
+presidential_elections_2020 <- read_csv("data/president_county_candidate.csv")
+```
+
+# Data Exploration
+
+```{r}
+# count the total number of votes each candidate got
+# start with presidential_elections_2020 and then group by candidate and 
+# summarize the sum of total_votes (3:13pm) add kable() to make your table look nice
+# and maybe arrange() to order candidates
+presidential_elections_2020 %>%
+  group_by(candidate) %>%
+  summarize(total = sum(total_votes)) %>%
+  arrange(-total) %>%
+  kable(col.names = c("Candidate", "Total Votes"),
+        format.args = list(big.mark = ","))
+
+```
+

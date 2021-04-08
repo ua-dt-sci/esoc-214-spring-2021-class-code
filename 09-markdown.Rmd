@@ -4,13 +4,14 @@ subtitle: "A ESOC 214 demonstration"
 author: "Adriana Picoral"
 date: "Spring 2021"
 output:
-  word_document:
+  html_document:
     toc: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
 # Text Formatting
@@ -51,6 +52,10 @@ beer_awards <- read_csv("data/clean_beer_awards.csv")
 glimpse(beer_awards)
 ```
 
+## Tables
+
+### Data Tables
+
 Here we printing the first 10 rows in our data.
 
 ```{r}
@@ -76,8 +81,40 @@ beer_awards %>%
 beer_awards %>%
   count(region) %>%
   arrange(-n) %>%
-  kable(col.names = c("Region", "Arward Count"))
+  kable(col.names = c("Region", "Award Count"),
+        caption = "Distribution of beer awards across regions in the US.")
 ```
+
+### Manual Tables
+
+| Column 1 | Column 2 | Column 3 |
+| -------- | :-------: | --------: |
+| word | word 2 | word 3 |
+| word | word 2 | word 3 |
+| word | word 2 | word 3 |
+| word | word 2 | word 3 |
+
+# Plots
+
+> Question: What is the distribution of awards across different beer categories and different regions?
+
+```{r fig.height=6}
+library(tidytext)
+
+beer_awards %>%
+  filter(region != "District of Columbia") %>%
+  count(region, macro_category) %>%
+  ggplot(aes(y = reorder_within(macro_category, n, region),
+             x = n,
+             fill = region)) +
+  geom_col() +
+  facet_wrap(~region, scales = "free_y") +
+  labs(y = "Beer Category") +
+  theme(legend.position = "none") +
+  scale_y_reordered()
+```
+
+
 
 
 
