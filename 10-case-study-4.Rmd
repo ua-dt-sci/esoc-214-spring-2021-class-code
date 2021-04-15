@@ -1,37 +1,126 @@
 ---
 title: "US Presidential Elections 2020"
 author: "Adriana Picoral"
-date: "4/8/2021"
+date: "Spring 2021"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(knitr)
+library(usmap)
 opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
-# Data Wrangling
+# Data Import
 
-The data used in this document is from [Kaggle's US Election 2020](https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv).
+The data used in this document is from [Kaggle's US Election 2020](https://www.kaggle.com/unanimad/us-election-2020?select=president_county_candidate.csv). 
 
 ```{r}
 presidential_elections_2020 <- read_csv("data/president_county_candidate.csv")
+votes_per_candidate <- read_csv("processed_data/votes_per_candidate.csv")
 ```
 
-# Data Exploration
+The data has `r ncol(presidential_elections_2020)` variables: `r colnames(presidential_elections_2020)`.
+
+There were `r nrow(votes_per_candidate)` options for president in the elections of 2020. The total number of people that voted was approximately `r round(sum(votes_per_candidate$total)/1000000, digits = 0)` million.
+
+# Data Analysis
+
+## Popular Vote
+
+Here's the total (popular) votes per candidate for the 2020 presidential elections.
 
 ```{r}
-# count the total number of votes each candidate got
-# start with presidential_elections_2020 and then group by candidate and 
-# summarize the sum of total_votes (3:13pm) add kable() to make your table look nice
-# and maybe arrange() to order candidates
-presidential_elections_2020 %>%
-  group_by(candidate) %>%
-  summarize(total = sum(total_votes)) %>%
-  arrange(-total) %>%
+votes_per_candidate %>%
   kable(col.names = c("Candidate", "Total Votes"),
         format.args = list(big.mark = ","))
 
+```
+
+Here's a plot of the top 5 most voted options for presidential elections.
+
+```{r}
+# visualize votes per candidate (10 minutes, check in at 2:47pm)
+votes_per_candidate %>%
+  top_n(5) %>%
+  mutate(dummy = ifelse(candidate == "Joe Biden",
+                        "highlight", "no_highlight")) %>%
+  mutate(total_per_mil = total/1000000) %>%
+  ggplot(aes(y = reorder(candidate, total),
+             x = total_per_mil,
+             fill = dummy,
+             label = round(total_per_mil, digits = 2))) +
+  geom_col() +
+  geom_label(fill = "white") +
+  theme_linedraw() +
+  labs(y = "",
+       x = "total number of votes in million",
+       title = "Millions of votes per candidate for the top 5 options",
+       subtitle = "in the 2020 presidential elections") +
+  scale_fill_manual(values = c("dodgerblue4", "grey")) +
+  theme(legend.position = "none")
+```
+
+
+```{r}
+# visualize votes per candidate (10 minutes, check in at 2:47pm)
+data_toplot <- votes_per_candidate %>%
+  top_n(5) %>%
+  mutate(total_per_mil = total/1000000)
+
+data_toplot %>%
+  ggplot(aes(y = reorder(candidate, total),
+             x = total_per_mil,
+             label = round(total_per_mil, digits = 2))) +
+  geom_col() +
+  geom_col(data = data_toplot %>% filter(candidate == "Donald Trump"),
+           fill = "firebrick3") +
+  geom_label() +
+  theme_linedraw() +
+  labs(y = "",
+       x = "total number of votes in million",
+       title = "Millions of votes per candidate for the top 5 options",
+       subtitle = "in the 2020 presidential elections")
+```
+
+## Electoral Votes
+
+```{r}
+# read data in
+pres_elect_votes <- read_csv("processed_data/pres_elect_votes.csv")
+```
+
+```{r fig.height=2}
+# start with pres_elect_votes and then
+# group by candidate and then
+# summarize the sum of electoral votes
+# plot a geom_col (bar plot) check in at 3pm
+pres_elect_votes %>%
+  group_by(candidate) %>%
+  summarize(total = sum(electoral_votes)) %>%
+  ggplot(aes(y = candidate,
+             x = total,
+             fill = candidate)) +
+  geom_col() +
+  geom_label(aes(label = total),
+             fill = "white") +
+  scale_fill_manual(values = c("firebrick3", "dodgerblue4")) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.text.x = element_blank()) +
+  labs(y = "", x = "",
+       title = "Number of Electoral Votes per Candidate")
+```
+
+```{r}
+pres_elect_votes %>%
+  plot_usmap(data = .,
+             values = "candidate") +
+  scale_fill_manual(values = c("firebrick3", "dodgerblue4")) +
+  theme(legend.position = "right") +
+  labs(fill = "Candidate",
+       title = "Who won each state?")
 ```
 
