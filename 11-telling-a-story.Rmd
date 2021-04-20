@@ -1,0 +1,112 @@
+---
+title: "Women Entrepreneurship and Labor Force"
+author: "Adriana Picoral"
+date: "4/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(janitor)
+library(knitr)
+library(tidyverse)
+opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+# Data and data question
+
+> What impact do women have on a country's economy?
+
+```{r}
+# shortcut for new block cmd+option+i or ctrl+alt+i
+# read data in
+women_business_data <- read_delim("data/women_in_labor_force.csv",
+                                  delim = ";") %>%
+  clean_names()
+```
+
+# Lead
+
+> How do we measure, in numeric terms, the difference between developed and developing countries?
+
+```{r}
+# start with the raw data and then
+# map inflation rate to y and level of development to x and add
+# geom_boxplot (2:35pm)
+women_business_data %>%
+  ggplot(aes(x = level_of_development,
+             y = inflation_rate)) +
+  geom_boxplot() +
+  theme_linedraw() +
+  labs(y = "inflation rate",
+       x = "level of development",
+       title = "Distribution of inflation rate",
+       subtitle = "across different countries")
+
+```
+
+As we can see in the plot above, developed countries have a lower inflation rate than developing countries.
+
+# Development
+
+> What affects inflation rate? What factor affects a country's economy?
+
+```{r}
+# scatter plot of inflation rate entrepreneurship index (geom_point)
+women_business_data %>%
+  ggplot(aes(x = entrepreneurship_index,
+             y = inflation_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_linedraw() +
+  labs(y = "inflation rate",
+       x = "entrepeneurship index",
+       title = "Relationship between inflation rate and entrepeneurship")
+
+```
+
+
+```{r}
+# run linear regression
+model_1 <- women_business_data %>%
+  lm(formula = inflation_rate ~ entrepreneurship_index) 
+
+# summary of model
+summary_model1 <- summary(model_1)
+
+# print out the coefficients
+summary_model1$coefficients %>%
+  kable()
+```
+
+The effect of entrepreneurship on inflation is negative, with inflation going down .13 points for each additional point in entrepreneurship.
+
+# Resolution
+
+> What is the effect of women participanting in their country's economy?
+
+```{r}
+women_business_data %>%
+  ggplot(aes(y = inflation_rate,
+             x = women_entrepreneurship_index)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_linedraw() +
+  labs(x = "Women Entreperneurship Index",
+       y = "inflation rate",
+       title = "Relationship between inflation rate and women entrepreneurship")
+```
+
+```{r}
+# run linear regression
+model_2 <- women_business_data %>%
+  lm(formula = inflation_rate ~ women_entrepreneurship_index)
+
+# summary of model
+summary_model_2 <- summary(model_2)
+
+# coefficients
+summary_model_2$coefficients %>%
+  kable()
+```
+
+
