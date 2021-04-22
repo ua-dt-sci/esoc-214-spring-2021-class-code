@@ -114,7 +114,9 @@ beer_awards %>%
   scale_y_reordered()
 ```
 
+There are `r nrow(beer_awards)` observations in the data.
 
+There are `r ncol(beer_awards)` variables in the data, and they are: `r colnames(beer_awards)`.
 
 
 
