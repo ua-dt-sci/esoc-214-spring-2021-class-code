@@ -109,4 +109,74 @@ summary_model_2$coefficients %>%
   kable()
 ```
 
+Women entrepreneurship has a statistically significant (p < .05) effect on inflation rate, with each positive point in this index lowering inflation rate by .17 points. This index explains 19% of the variation in the data.
+
+## Overlay both plots
+
+```{r}
+ggplot(data = women_business_data) +
+  geom_point(aes(y = inflation_rate,
+             x = entrepreneurship_index),
+             color = "brown4") +
+  geom_smooth(aes(y = inflation_rate,
+             x = entrepreneurship_index),
+             method = "lm", color = "brown4") +
+  geom_point(aes(y = inflation_rate,
+                 x = women_entrepreneurship_index),
+             color = "dodgerblue4") +
+  geom_smooth(aes(y = inflation_rate,
+                  x = women_entrepreneurship_index),
+              method = "lm", color = "dodgerblue4") +
+  theme_linedraw() 
+  
+```
+
+
+
+```{r}
+# scatterplot
+women_business_data %>%
+  ggplot(aes(y = inflation_rate,
+             x = female_labor_force_participation_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_linedraw() +
+  labs(x = "female labor force participation rate",
+       y = "inflation rate",
+       title = "Relationship between inflation rate and female labor force participation")
+
+# run linear regression
+model_3 <- women_business_data %>%
+  lm(formula = inflation_rate ~ female_labor_force_participation_rate)
+
+# summary of model_3
+summary_model_model_3 <- summary(model_3)
+
+# inspect summary
+summary_model_model_3$coefficients %>%
+  kable()
+```
+
+Female labor force participation rate does not have a significant effect on inflation rate (p > .05).
+
+# Multivariate linear linear
+
+> Does being a member of the European Union have an effect on a countries economy? What about members and non membership and women entreperneurship index?
+
+```{r}
+women_business_data %>%
+  ggplot(aes(y = inflation_rate,
+             x = women_entrepreneurship_index,
+             color = european_union_membership)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# regression
+model_4 <- women_business_data %>%
+  lm(formula = inflation_rate ~ women_entrepreneurship_index + european_union_membership)
+
+# summary
+summary(model_4)
+```
+
 
