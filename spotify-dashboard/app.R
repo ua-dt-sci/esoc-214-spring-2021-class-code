@@ -10,6 +10,9 @@
 library(shiny)
 library(tidyverse)
 
+# global variable for output
+string_to_print <- ""
+
 # read data in
 spotify_data <- read_csv("data/spotify_songs.csv") %>%
     mutate(release_year = as.numeric(substr(track_album_release_date, 1, 4)))
@@ -45,7 +48,8 @@ ui <- fluidPage(
                         selected = "pop"),
             selectInput("selected_variable",
                         "Select variable to plot:",
-                        choices = variables)
+                        choices = variables),
+            htmlOutput("hover_info")
         ),
 
         # Show a plot of the generated distribution
@@ -54,7 +58,8 @@ ui <- fluidPage(
                        tabPanel("Bar Plot",
                                 plotOutput("bar_plot")),
                        tabPanel("Time Line",
-                                plotOutput("timeline")),
+                                plotOutput("timeline",
+                                           hover = hoverOpts(id = "plot_hover"))),
                        tabPanel("Instructions",
                                 p("To use this dashboard, follow these instructions..."))
                
@@ -103,6 +108,26 @@ server <- function(input, output) {
                 labs(y = input$selected_variable)
         }
         
+        
+    })
+    
+    output$hover_info <- renderPrint({
+        
+        hover_y <- input$plot_hover$y
+        hover_x <- as.integer(input$plot_hover$x)
+        
+        if (!is.null(input$plot_hover)) {
+            list_of_songs <- spotify_data %>%
+                filter(release_year == hover_x) %>%
+                pull(track_name)
+            
+            string_to_print <<- paste("<strong>Info on Hover</strong><br>y:",
+                 hover_y, "<br>x:", hover_x, "<br>",
+                 paste(list_of_songs, collapse = "<br>"))
+        }
+        
+        
+        HTML(string_to_print)
         
     })
     
